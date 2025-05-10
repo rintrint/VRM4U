@@ -74,10 +74,10 @@ void FVrmSceneViewExtension::PostRenderBasePassDeferred_RenderThread(FRDGBuilder
 	//const FSceneTextures& st = static_cast<const FViewInfo&>(View).GetSceneTextures();
 
 
-	// GBuffer ‚Ì BaseColor ‚ğæ“¾i—á: GBufferA ‚ÉŠi”[‚³‚ê‚Ä‚¢‚é‚Æ‰¼’èj
+	// GBuffer ã® BaseColor ã‚’å–å¾—ï¼ˆä¾‹: GBufferA ã«æ ¼ç´ã•ã‚Œã¦ã„ã‚‹ã¨ä»®å®šï¼‰
 	//FRDGTextureRef GBufferBaseColorTexture = SceneTextures.GBufferA;
 	//FRDGTextureRef GBufferBaseColorTexture = GraphBuilder.RegisterExternalTexture(
-	//	InView.Scene->SceneTexturesUniformBuffer->GetRDGTexture("GBufferATexture"), // ‰¼‚Ìæ“¾•û–@
+	//	InView.Scene->SceneTexturesUniformBuffer->GetRDGTexture("GBufferATexture"), // ä»®ã®å–å¾—æ–¹æ³•
 	//	TEXT("GBufferBaseColor")
 	//);
 	//PassTextures.Depth = SceneTextures.Depth;
@@ -99,48 +99,48 @@ void FVrmSceneViewExtension::PostRenderBasePassDeferred_RenderThread(FRDGBuilder
 	{
 		RenderTargets.DepthStencil.GetTexture();
 
-		// RenderTargets ‚Ì0”Ô–Ú‚ğæ“¾
+		// RenderTargets ã®0ç•ªç›®ã‚’å–å¾—
 		const FRenderTargetBinding& FirstTarget = RenderTargets[0];
 		//if (!FirstTarget.IsValid()) return;
 
 		FRDGTextureRef SourceTexture = FirstTarget.GetTexture();
 		if (!SourceTexture) return;
 
-		// ƒRƒs[æ‚ÌƒeƒNƒXƒ`ƒƒ‚ğì¬
+		// ã‚³ãƒ”ãƒ¼å…ˆã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆ
 		FRDGTextureDesc CopyDesc = SourceTexture->Desc;
 		FRDGTextureRef CopiedTexture = GraphBuilder.CreateTexture(
 			CopyDesc,
 			TEXT("CopiedGBuffer")
 		);
 
-		// ƒeƒNƒXƒ`ƒƒ‚ğƒRƒs[
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚³ãƒ”ãƒ¼
 		AddCopyTexturePass(
 			GraphBuilder,
 			SourceTexture,
 			CopiedTexture,
-			FIntPoint(0, 0),  // ƒRƒs[Œ³ƒIƒtƒZƒbƒg
-			FIntPoint(0, 0)   // ƒRƒs[æƒIƒtƒZƒbƒg
+			FIntPoint(0, 0),  // ã‚³ãƒ”ãƒ¼å…ƒã‚ªãƒ•ã‚»ãƒƒãƒˆ
+			FIntPoint(0, 0)   // ã‚³ãƒ”ãƒ¼å…ˆã‚ªãƒ•ã‚»ãƒƒãƒˆ
 		);
 
-		// SRVi“Ç‚İ‚İ—pj‚ğì¬
+		// SRVï¼ˆèª­ã¿è¾¼ã¿ç”¨ï¼‰ã‚’ä½œæˆ
 		FRDGTextureSRVRef InputSRV = GraphBuilder.CreateSRV(CopiedTexture);
 	}
 
-		// RenderTargets ‚Ì0”Ô–Ú‚ğæ“¾
+		// RenderTargets ã®0ç•ªç›®ã‚’å–å¾—
 	const FRenderTargetBinding& FirstTarget = RenderTargets[0];
 	//if (!FirstTarget.IsValid())
 	//{
-	//	return; // ƒ^[ƒQƒbƒg‚ª–³Œø‚Èê‡ƒXƒLƒbƒv
+	//	return; // ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãŒç„¡åŠ¹ãªå ´åˆã‚¹ã‚­ãƒƒãƒ—
 	//}
 
-	// FRDGTexture ‚ğæ“¾
+	// FRDGTexture ã‚’å–å¾—
 	FRDGTextureRef TargetTexture = FirstTarget.GetTexture();
 	if (!TargetTexture)
 	{
-		return; // ƒeƒNƒXƒ`ƒƒ‚ªæ“¾‚Å‚«‚È‚¢ê‡ƒXƒLƒbƒv
+		return; // ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒå–å¾—ã§ããªã„å ´åˆã‚¹ã‚­ãƒƒãƒ—
 	}
 
-	// UAV ‚ğì¬
+	// UAV ã‚’ä½œæˆ
 	FRDGTextureUAVRef GBufferUAV = GraphBuilder.CreateUAV(TargetTexture);
 
 
@@ -161,22 +161,22 @@ void FVrmSceneViewExtension::PostRenderBasePassDeferred_RenderThread(FRDGBuilder
 
 	//RenderTargets.
 
-	// Render Target‚ğRDGƒŠƒ\[ƒX‚É•ÏŠ·
+	// Render Targetã‚’RDGãƒªã‚½ãƒ¼ã‚¹ã«å¤‰æ›
 	FRDGTextureRef OutputTexture = GraphBuilder.RegisterExternalTexture(CreateRenderTarget(RenderTarget->GameThread_GetRenderTargetResource(), TEXT("OutputTexture")));
 	FRDGTextureUAVRef OutputUAV = GraphBuilder.CreateUAV(OutputTexture);
 
-	// ƒpƒ‰ƒ[ƒ^‚ğİ’è
+	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¨­å®š
 	FMyComputeShader::FParameters* Parameters = GraphBuilder.AllocParameters<FMyComputeShader::FParameters>();
 	Parameters->OutputTexture = OutputUAV;
 
-	// Shader‚ğ’Ç‰Á‚µ‚ÄƒfƒBƒXƒpƒbƒ`
+	// Shaderã‚’è¿½åŠ ã—ã¦ãƒ‡ã‚£ã‚¹ãƒ‘ãƒƒãƒ
 	TShaderMapRef<FMyComputeShader> ComputeShader(GetGlobalShaderMap(GMaxRHIFeatureLevel));
 	FComputeShaderUtils::AddPass(
 		GraphBuilder,
 		RDG_EVENT_NAME("MyComputeShader"),
 		ComputeShader,
 		Parameters,
-		FIntVector(RenderTarget->SizeX / 8, RenderTarget->SizeY / 8, 1) // ƒXƒŒƒbƒhƒOƒ‹[ƒv”
+		FIntVector(RenderTarget->SizeX / 8, RenderTarget->SizeY / 8, 1) // ã‚¹ãƒ¬ãƒƒãƒ‰ã‚°ãƒ«ãƒ¼ãƒ—æ•°
 	);
 
 	GraphBuilder.Execute();
