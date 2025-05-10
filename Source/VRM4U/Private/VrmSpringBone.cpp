@@ -1,4 +1,4 @@
-﻿#include "VrmSpringBone.h"
+#include "VrmSpringBone.h"
 
 #include "VrmAssetListObject.h"
 
