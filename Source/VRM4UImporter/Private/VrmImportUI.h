@@ -13,7 +13,7 @@
 
 DECLARE_DELEGATE(FOnResolveFbxReImport);
 
-UCLASS(config=EditorPerProjectUserSettings, AutoExpandCategories=(FTransform, Mesh, AdvancedDisplay), HideCategories=Object, MinimalAPI)
+UCLASS(config=EditorPerProjectUserSettings, AutoExpandCategories=(FTransform), HideCategories=Object, MinimalAPI)
 class UVrmImportUI : public UObject, public IImportSettingsParser
 {
 	GENERATED_UCLASS_BODY()

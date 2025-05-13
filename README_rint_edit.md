@@ -14,7 +14,7 @@
 "EnabledByDefault": true,
 int32 ImportPriority = 120;
 TArray<FString> extList = {TEXT("pmx")};
-AutoExpandCategories = (FTransform, Mesh, AdvancedDisplay)
+// AutoExpandCategories = (FTransform, Mesh, AdvancedDisplay) // 好像没效果
 ```
 
 ## 代码风格  
