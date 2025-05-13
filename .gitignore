@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# UE5 Generated Folders
+Binaries/
+Intermediate/
