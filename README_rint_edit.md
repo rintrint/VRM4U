@@ -41,7 +41,7 @@ FPackageName: Skipped package /Game/MyContent/Model/test has a valid, mounted, m
 PMX Editor保存空白模型，导入UE5会闪退，可能是因为没有Mesh  
 
 ## 其他要注意的地方  
-如果没有开启Support 16-bit Bone Index，容易出现bonemap over!警告讯息  
+如果有开启Support 16-bit Bone Index，则可以无视bonemap over!警告讯息  
 
 VrmConvertTexture.cpp  
 这个档案中的大部分代码其实是在处理Material Instance的设置，而不仅仅是Texture的转换  
