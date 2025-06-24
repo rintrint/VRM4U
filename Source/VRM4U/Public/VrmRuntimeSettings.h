@@ -40,16 +40,16 @@ class VRM4U_API UVrmRuntimeSettings : public UObject
 		))
 	FSoftObjectPath AssetListObject;
 
-	/** priority<100 for VRM4U. Default plugins priority=100 */
+	/** priority>100 for VRM4U. Default plugins priority=100 */
 	UPROPERTY(config, EditAnywhere, Category = Settings, meta = (
 		ConfigRestartRequired = true
 		))
-	int32 ImportPriority = 90;
+	int32 ImportPriority = 120;
 
 	UPROPERTY(config, EditAnywhere, Category = Settings, meta = (
 		ConfigRestartRequired = true
 		))
-	TArray<FString> extList;
+	TArray<FString> extList = {TEXT("pmx")};
 
 
 #if WITH_EDITOR

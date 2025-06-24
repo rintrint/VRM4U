@@ -269,10 +269,13 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 			{
 				const FString Extension = FPaths::GetExtension(fullFileName);
 				if (Extension.ToLower() == TEXT("pmx")) {
-					ImportUI->ModelScale = 0.1f;
-					ImportUI->bMergeMaterial = false;
-					ImportUI->bMergePrimitive = false;
-					ImportUI->bForceTwoSided = true;
+					ImportUI->ModelScale = 0.08f;
+					ImportUI->bMergeMaterial = true;
+					ImportUI->bMergePrimitive = true;
+					ImportUI->bForceTwoSided = false;
+					ImportUI->bGenerateOutlineMaterial = false;
+					ImportUI->bSkipPhysics = true;
+					// ImportUI->MaterialType = EVRMImportMaterialType::VRMIMT_SSSProfile;
 				}
 				if (Extension.ToLower() == TEXT("bvh")) {
 					ImportUI->ModelScale = 0.01f;
@@ -283,7 +286,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 				ImportUI->bSingleUAssetFile = true;
 			}
 #else
-			// 5.2でも動くが、デフォルトをOFFにする
+			// 5.2縺ｧ繧ょ虚縺上′縲√ョ繝輔か繝ｫ繝医ｒOFF縺ｫ縺吶ｋ
 #endif
 
 
