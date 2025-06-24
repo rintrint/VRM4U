@@ -113,6 +113,48 @@ namespace {
 		}
 	}
 
+	void LocalStaticSwitchParameterSet(UMaterialInstanceConstant* dm, FName name, bool bValue)
+	{
+		bool bSet = false;
+#if WITH_EDITOR
+		if (VRMConverter::IsImportMode())
+		{
+			FMaterialParameterInfo ParameterInfo(name);
+			dm->SetStaticSwitchParameterValueEditorOnly(ParameterInfo, bValue);
+			bSet = true;
+		}
+#endif
+		if (bSet == false)
+		{
+			FStaticParameterSet StaticParameters = dm->GetStaticParameters();
+
+			bool bFoundParameter = false;
+			for (FStaticSwitchParameter& Param : StaticParameters.StaticSwitchParameters)
+			{
+				if (Param.ParameterInfo.Name == name)
+				{
+					Param.Value = bValue;
+					Param.bOverride = true;
+					bFoundParameter = true;
+					break;
+				}
+			}
+
+			if (!bFoundParameter)
+			{
+				FStaticSwitchParameter NewParam;
+				NewParam.ParameterInfo.Name = name;
+				NewParam.Value = bValue;
+				NewParam.bOverride = true;
+				StaticParameters.StaticSwitchParameters.Add(NewParam);
+			}
+
+#if WITH_EDITOR
+			dm->UpdateStaticPermutation(StaticParameters);
+#endif
+		}
+	}
+
 	void LocalVectorParameterSet(UMaterialInstanceConstant *dm, FName name, FLinearColor c) {
 		bool bSet = false;
 #if WITH_EDITOR
@@ -765,7 +807,7 @@ bool VRMConverter::ConvertTextureAndMaterial(UVrmAssetListObject *vrmAssetList) 
 #endif
 
 				if (NormalBoolTable[i]) {
-					// UE5.5でクラッシュするので update後に再度更新
+					// UE5.5縺ｧ繧ｯ繝ｩ繝�繧ｷ繝･縺吶ｋ縺ｮ縺ｧ update蠕後↓蜀榊ｺｦ譖ｴ譁ｰ
 					NewTexture2D->CompressionSettings = TC_Normalmap;
 					NewTexture2D->UpdateResource();
 #if WITH_EDITOR
@@ -977,6 +1019,19 @@ bool VRMConverter::ConvertTextureAndMaterial(UVrmAssetListObject *vrmAssetList) 
 					}
 					if (ShaderName.Find(TEXT("UnlitTransparent")) >= 0) {
 						bTranslucent = true;
+					}
+				}
+				// Check transparency for PMX model
+				if (Options::Get().IsPMXModel())
+				{
+					float opacity = 1.f;
+					aiReturn result = aiMat.Get(AI_MATKEY_OPACITY, opacity);
+					if (result == AI_SUCCESS)
+					{
+						if (opacity < 1.f)
+						{
+							bTranslucent = true;
+						}
 					}
 				}
 				if (Options::Get().IsForceOpaque()) {
@@ -1206,6 +1261,26 @@ bool VRMConverter::ConvertTextureAndMaterial(UVrmAssetListObject *vrmAssetList) 
 								if (Options::Get().IsForceOpaque() == false) {
 									dm->BasePropertyOverrides.bOverride_BlendMode = true;;
 									dm->BasePropertyOverrides.BlendMode = EBlendMode::BLEND_Translucent;
+								}
+							}
+						}
+					}
+					// Apply transparency settings for PMX model
+					if (Options::Get().IsPMXModel())
+					{
+						float opacity = 1.f;
+						aiReturn result = aiMat.Get(AI_MATKEY_OPACITY, opacity);
+						if (result == AI_SUCCESS)
+						{
+							if (opacity < 1.f)
+							{
+								if (Options::Get().IsForceOpaque() == false)
+								{
+									dm->BasePropertyOverrides.bOverride_BlendMode = true;
+									dm->BasePropertyOverrides.BlendMode = EBlendMode::BLEND_Translucent;
+
+									LocalStaticSwitchParameterSet(dm, TEXT("bUseDitherAlpha"), true);
+									LocalScalarParameterSet(dm, TEXT("DitherAlpha"), opacity);
 								}
 							}
 						}
