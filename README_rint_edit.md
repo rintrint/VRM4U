@@ -20,6 +20,7 @@ TArray<FString> extList = {TEXT("pmx")};
 修改的源代码文件整理  
 - VrmRuntimeSettings.h
 - VRM4UImporterFactory.cpp
+- VrmConvertTexture.cpp
 
 ## 代码风格  
 使用.clang-format文件  
