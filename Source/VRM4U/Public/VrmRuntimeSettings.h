@@ -42,7 +42,7 @@ class VRM4U_API UVrmRuntimeSettings : public UObject
 
 	/** priority>100 for VRM4U. Default plugins priority=100 */
 	UPROPERTY(config, EditAnywhere, Category = Settings, meta = (
-		ConfigRestartRequired = true
+		ConfigRestartRequired = false
 		))
 	int32 ImportPriority = 120;
 
