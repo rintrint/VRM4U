@@ -588,7 +588,9 @@ EReimportResult::Type UVRM4UImporterFactory::Reimport(UObject* Obj) {
 	return EReimportResult::Succeeded;
 }
 int32 UVRM4UImporterFactory::GetPriority() const {
-	return ImportPriority;
+	const UVrmRuntimeSettings* Settings = GetDefault<UVrmRuntimeSettings>();
+	const int CurrentImportPriority = FMath::Max(1, Settings->ImportPriority);
+	return CurrentImportPriority;
 }
 
 
