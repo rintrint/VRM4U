@@ -517,7 +517,7 @@ namespace {
 			int count = 0;
 			for (auto &t : tableParam) {
 				++count;
-				if (t.value < 0) {
+				if (t.value < 0 || t.value >= vrmAssetList->Textures.Num()) {
 					continue;
 				}
 				LocalTextureSet(dm, *t.key, vrmAssetList->Textures[t.value]);
@@ -537,7 +537,7 @@ namespace {
 			// gltf default texture
 			{
 				auto n = TextureTypeToIndex[aiTextureType_NORMALS];
-				if (n >= 0) {
+				if (0 <= n && n < vrmAssetList->Textures.Num()) {
 					vrmAssetList->Textures[n]->SRGB = false;
 					vrmAssetList->Textures[n]->CompressionSettings = TC_Normalmap;
 					vrmAssetList->Textures[n]->UpdateResource();
@@ -546,7 +546,7 @@ namespace {
 			}
 			{
 				auto n = TextureTypeToIndex[aiTextureType_EMISSIVE];
-				if (n >= 0) {
+				if (0 <= n && n < vrmAssetList->Textures.Num()) {
 					LocalTextureSet(dm, TEXT("mtoon_tex_Emissive"), vrmAssetList->Textures[n]);
 				}
 			}
@@ -1146,11 +1146,11 @@ bool VRMConverter::ConvertTextureAndMaterial(UVrmAssetListObject *vrmAssetList) 
 			{
 				UMaterialInstanceConstant* dm = nullptr;
 				{
-					const FString origname = (FString(TEXT("M_")) + NormalizeFileName(aiMat.GetName().C_Str()));
+					const FString origname = (FString(TEXT("MI_")) + NormalizeFileName(aiMat.GetName().C_Str()));
 					FString name = origname;
 
 					if (MatNameList.Find(origname)) {
-						name += FString::Printf(TEXT("_%03d"), MatNameList[name]);// TEXT("_2");
+						name += FString::Printf(TEXT("_%03d"), MatNameList[name]);
 					}
 					MatNameList.FindOrAdd(origname)++;
 
@@ -1246,6 +1246,7 @@ bool VRMConverter::ConvertTextureAndMaterial(UVrmAssetListObject *vrmAssetList) 
 							if (tex) {
 								LocalTextureSet(dm, TEXT("gltf_tex_diffuse"), tex);
 								LocalTextureSet(dm, TEXT("mtoon_tex_ShadeTexture"), tex);
+								LocalTextureSet(dm, TEXT("mtoon_tex_Shade"), tex);
 							}
 						}
 					}

@@ -36,7 +36,7 @@
 #include "RenderGraphBuilder.h"
 #include "ProfilingDebugging/CpuProfilerTrace.h"
 #include "Stats/Stats.h"
-
+#include "DynamicRHI.h"
 
 DECLARE_GPU_STAT(VRM4U);
 
@@ -72,6 +72,11 @@ class FMyComputeShader : public FGlobalShader
 		SHADER_PARAMETER(FVector3f, LightPosition)
 		SHADER_PARAMETER(FVector3f, LightDirection)
 		SHADER_PARAMETER(FVector3f, LightColor)
+		SHADER_PARAMETER(float, LightScale)
+		SHADER_PARAMETER(float, RimEdgeFade)
+
+		SHADER_PARAMETER(float, UseBinaryEdge)
+		SHADER_PARAMETER(float, RimEdgeBinaryRange)
 
 		SHADER_PARAMETER(float, SampleScreenScale)
 		SHADER_PARAMETER(float, SampleScale)
@@ -99,8 +104,16 @@ IMPLEMENT_GLOBAL_SHADER(FMyComputeShader, "/VRM4UShaders/private/BaseColorCS.usf
 #endif
 
 
-static bool CurrentShaderModelSM6()
+static bool LocalCSEnable()
 {
+
+	static const auto CVarCustomDepth = IConsoleManager::Get().FindTConsoleVariableDataInt(TEXT("r.CustomDepth"));
+	const int32 EnabledWithStencil = 3;// CustomDepthMode::EnabledWithStencil ‚Å‚Íƒ_ƒB
+	if (CVarCustomDepth) {
+		if (CVarCustomDepth->GetValueOnAnyThread() != EnabledWithStencil) {
+			return false;
+		}
+	}
 
 	if (GMaxRHIFeatureLevel >= ERHIFeatureLevel::SM6) {
 		return true;
@@ -321,6 +334,11 @@ static void LocalRimFilter(FRDGBuilder& GraphBuilder, FSceneView& InView, const 
 
 		Parameters->UseCustomLightColor = d.bUseCustomLighColor;
 		Parameters->LightColor = FVector3f(d.LightColor);
+		Parameters->LightScale = d.LightScale;
+		Parameters->RimEdgeFade = d.RimEdgeFade;
+
+		Parameters->UseBinaryEdge = d.bUseBinaryEdge;
+		Parameters->RimEdgeBinaryRange = d.RimEdgeBinaryRange;
 
 		Parameters->SampleScreenScale = d.SampleScreenScale;
 		Parameters->SampleScale = d.SampleScale;
@@ -375,7 +393,7 @@ FVrmSceneViewExtension::FVrmSceneViewExtension(const FAutoRegister& AutoRegister
 
 void FVrmSceneViewExtension::PostRenderBasePassDeferred_RenderThread(FRDGBuilder& GraphBuilder, FSceneView& InView, const FRenderTargetBindingSlots& RenderTargets, TRDGUniformBufferRef<FSceneTextureUniformParameters> SceneTextures) {
 
-	if (CurrentShaderModelSM6() == false) return;
+	if (LocalCSEnable() == false) return;
 
 	const auto FeatureLevel = InView.GetFeatureLevel();
 	if (FeatureLevel <= ERHIFeatureLevel::SM5) return;
