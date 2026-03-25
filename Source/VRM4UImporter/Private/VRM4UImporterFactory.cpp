@@ -276,10 +276,11 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 				const FString Extension = FPaths::GetExtension(fullFileName);
 				if (Extension.ToLower() == TEXT("pmx")) {
 					ImportUI->ModelScale = 0.08f;
-					ImportUI->bMergeMaterial = true;
+					ImportUI->bMergeMaterial = false;
 					ImportUI->bMergePrimitive = true;
 					ImportUI->bForceTwoSided = false;
 					ImportUI->bGenerateOutlineMaterial = false;
+					ImportUI->bGenerateRigIK = false;
 					ImportUI->bSkipPhysics = true;
 					// ImportUI->MaterialType = EVRMImportMaterialType::VRMIMT_SSSProfile;
 				}
