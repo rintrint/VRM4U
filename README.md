@@ -1,5 +1,13 @@
 # VRM4U
 
+| UE5 ver   | Plugin Ver  |
+|-----------|-------------|
+| UE5.5     | VRM4U_UE5.5 |
+| UE5.6     | VRM4U_UE5.6 |
+| UE5.7     | main branch |
+
+---
+
 [English Doc](https://github.com/ruyo/VRM4U/blob/master/README_en.md)
 
 ## はじめに

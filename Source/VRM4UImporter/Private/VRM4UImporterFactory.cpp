@@ -275,10 +275,14 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 			{
 				const FString Extension = FPaths::GetExtension(fullFileName);
 				if (Extension.ToLower() == TEXT("pmx")) {
-					ImportUI->ModelScale = 0.1f;
+					ImportUI->ModelScale = 0.08f;
 					ImportUI->bMergeMaterial = false;
-					ImportUI->bMergePrimitive = false;
-					ImportUI->bForceTwoSided = true;
+					ImportUI->bMergePrimitive = true;
+					ImportUI->bForceTwoSided = false;
+					ImportUI->bGenerateOutlineMaterial = false;
+					ImportUI->bGenerateRigIK = false;
+					ImportUI->bSkipPhysics = true;
+					// ImportUI->MaterialType = EVRMImportMaterialType::VRMIMT_SSSProfile;
 				}
 				if (Extension.ToLower() == TEXT("bvh")) {
 					ImportUI->ModelScale = 0.01f;
@@ -585,7 +589,9 @@ EReimportResult::Type UVRM4UImporterFactory::Reimport(UObject* Obj) {
 	return EReimportResult::Succeeded;
 }
 int32 UVRM4UImporterFactory::GetPriority() const {
-	return ImportPriority;
+	const UVrmRuntimeSettings* Settings = GetDefault<UVrmRuntimeSettings>();
+	const int CurrentImportPriority = FMath::Max(1, Settings->ImportPriority);
+	return CurrentImportPriority;
 }
 
 
