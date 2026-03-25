@@ -264,6 +264,25 @@ static bool readMorph2(TArray<FMorphTargetDelta> &MorphDeltas, aiString targetNa
 	return MorphDeltas.Num() != 0;
 }
 
+// 替换UE5骨骼名称和Animation Curve不允许使用的非法字符为"_"
+static FString NormalizeBoneAndMorphName(const FString& InName)
+{
+	// All ASCII punctuation to replace with '_'
+	static const TSet<TCHAR> PunctuationSet = {
+		' ', '!', '"', '#', '$', '%', '&', '\'',
+		'(', ')', '*', '+', ',', '-', '.', '/',
+		':', ';', '<', '=', '>', '?', '@',
+		'[', '\\', ']', '^', '`', '{', '|', '}', '~'
+	};
+
+	FString Result = InName;
+	for (TCHAR& Ch : Result)
+	{
+		if (PunctuationSet.Contains(Ch))
+			Ch = TEXT('_');
+	}
+	return Result;
+}
 
 bool VRMConverter::ConvertMorphTarget(UVrmAssetListObject *vrmAssetList) {
 	if (Options::Get().IsSkipMorphTarget()) {
@@ -300,15 +319,20 @@ bool VRMConverter::ConvertMorphTarget(UVrmAssetListObject *vrmAssetList) {
 					//morphName = *mName;
 				} else {
 					morphName = VRMUtil::MakeName(morphName);
+					morphName = NormalizeBoneAndMorphName(morphName); // 移除所有Animation Curve不允許的字符
 
 					bool isInvalidName = VRMUtil::IsNoSafeName(morphName);
+					if (isInvalidName)
+					{
+						morphName = TEXT("Morph") + morphName;
+					}
 
 					auto tmp = morphName;
 					int i = 0;
-					while (MorphNameList.Find(tmp) != INDEX_NONE || isInvalidName) {
+					while (MorphNameList.Find(tmp) != INDEX_NONE)
+					{
 						++i;
-						isInvalidName = false;
-						tmp = TEXT("UE5EA_patch_") + morphName + TEXT("_") + FString::FromInt(i);
+						tmp = morphName + FString::FromInt(i);
 					}
 					morphName = tmp;
 
