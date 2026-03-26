@@ -190,15 +190,20 @@ UObject* UVRMImporterFactory::FactoryCreateFile
 
 UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, const TCHAR* Type, const uint8*& Buffer, const uint8* BufferEnd, FFeedbackContext* Warn, bool& bOutOperationCanceled)
 {
+	double t0 = FPlatformTime::Seconds();
+	UE_LOG(LogTemp, Warning, TEXT("測試1: %.2f sec"), FPlatformTime::Seconds() - t0);
+
 	if (fullFileName.IsEmpty()) {
 		return nullptr;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("測試2: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	if (VRMConverter::Options::Get().IsDebugIgnoreVRMValidation() == false) {
 		if (ULoaderBPFunctionLibrary::IsValidVRM4UFile(fullFileName) == false) {
 			return nullptr;
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("測試3: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	static UVrmImportUI* ImportUI = nullptr;
 #if	UE_VERSION_OLDER_THAN(5,0,0)
@@ -206,11 +211,14 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 #else
 	TSoftObjectPtr<UObject> refPointerToLic;
 #endif
+
+	UE_LOG(LogTemp, Warning, TEXT("測試4: %.2f sec"), FPlatformTime::Seconds() - t0);
 	{
 		if (ImportUI == nullptr) {
 			ImportUI = NewObject<UVrmImportUI>(this, NAME_None, RF_NoFlags);
 			ImportUI->AddToRoot();
 		}
+		UE_LOG(LogTemp, Warning, TEXT("測試5: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		// to default
 		{
@@ -238,6 +246,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 			ImportUI->LicenseBool.Empty();
 			ImportUI->LicenseStringArray.Empty();
 		}
+		UE_LOG(LogTemp, Warning, TEXT("測試6: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		if (1) {
 			UVrmLicenseObject* a = nullptr;
@@ -256,7 +265,9 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 
 				refPointerToLic = a;
 			}
-			if (b) {
+			UE_LOG(LogTemp, Warning, TEXT("測試7: %.2f sec"), FPlatformTime::Seconds() - t0);
+			if (b)
+			{
 				{
 					auto *p = b->LicenseString.FindByPredicate([](const FLicenseStringDataPair &pair) {
 						if (pair.key == TEXT("name")) return true;
@@ -272,6 +283,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 				ImportUI->LicenseStringArray = b->LicenseStringArray;
 				refPointerToLic = b;
 			}
+			UE_LOG(LogTemp, Warning, TEXT("測試8: %.2f sec"), FPlatformTime::Seconds() - t0);
 			{
 				const FString Extension = FPaths::GetExtension(fullFileName);
 				if (Extension.ToLower() == TEXT("pmx")) {
@@ -288,14 +300,15 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 					ImportUI->ModelScale = 0.01f;
 				}
 			}
-#if	UE_VERSION_OLDER_THAN(5,2,0)
+			UE_LOG(LogTemp, Warning, TEXT("測試9: %.2f sec"), FPlatformTime::Seconds() - t0);
+#if UE_VERSION_OLDER_THAN(5, 2, 0)
 			{
 				ImportUI->bSingleUAssetFile = true;
 			}
 #else
 			// 5.2でも動くが、デフォルトをOFFにする
 #endif
-
+			UE_LOG(LogTemp, Warning, TEXT("測試10: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 #if	UE_VERSION_OLDER_THAN(5,0,0)
 #else
@@ -310,6 +323,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 #endif
 		}
 
+		UE_LOG(LogTemp, Warning, TEXT("測試11: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		TSharedPtr<SWindow> ParentWindow;
 
@@ -318,6 +332,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 			IMainFrameModule& MainFrame = FModuleManager::LoadModuleChecked<IMainFrameModule>("MainFrame");
 			ParentWindow = MainFrame.GetParentWindow();
 		}
+		UE_LOG(LogTemp, Warning, TEXT("測試12: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		// Compute centered window position based on max window size, which include when all categories are expanded
 		const float FbxImportWindowWidth = 410.0f * 2.f;
@@ -334,6 +349,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 
 		FVector2D WindowPosition = (DisplayTopLeft + (DisplaySize - FbxImportWindowSize) / 2.0f) / ScaleFactor;
 
+		UE_LOG(LogTemp, Warning, TEXT("測試13: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		TSharedRef<SWindow2> Window = SNew(SWindow2)
 			.Title(NSLOCTEXT("UnrealEd", "VRMImportOpionsTitle", "VRM Import Options"))
@@ -341,6 +357,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 			.AutoCenter(EAutoCenter::None)
 			.ClientSize(FbxImportWindowSize)
 			.ScreenPosition(WindowPosition);
+		UE_LOG(LogTemp, Warning, TEXT("測試14: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		TSharedPtr<SVrmOptionWindow> VrmOptionWindow;
 		Window->SetContent
@@ -354,16 +371,18 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 			.MaxWindowHeight(FbxImportWindowHeight)
 			.MaxWindowWidth(FbxImportWindowWidth)
 		);
+		UE_LOG(LogTemp, Warning, TEXT("測試15: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		// @todo: we can make this slow as showing progress bar later
 		FSlateApplication::Get().AddModalWindow(Window, ParentWindow);
+		UE_LOG(LogTemp, Warning, TEXT("測試16: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		if (VrmOptionWindow->ShouldImport() == false) {
 			bOutOperationCanceled = true;
 
 			return nullptr;
 		}
-
+		UE_LOG(LogTemp, Warning, TEXT("測試17: %.2f sec"), FPlatformTime::Seconds() - t0);
 	}
 
 	//static ConstructorHelpers::FObjectFinder<UObject> MatClass(TEXT("/Game/test/NewMaterial.NewMaterial"));
@@ -378,6 +397,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 	auto& importOption = VRMConverter::Options::Get();
 	importOption.SetVrmOption(ImportUI->GenerateOptionData());
 
+	UE_LOG(LogTemp, Warning, TEXT("測試18: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 #if	UE_VERSION_OLDER_THAN(5,0,0)
 	TAssetPtr<UVrmAssetListObject> vrmAssetList;
@@ -387,6 +407,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 	TArray< TSoftObjectPtr<UObject> > tt;
 #endif
 	tt.Add(InParent);
+	UE_LOG(LogTemp, Warning, TEXT("測試19: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	//TRefCountPtr<UVrmAssetListObject> m;
 	//UVrmAssetListObject *m = nullptr;
@@ -397,6 +418,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 #endif
 	{
 		const UVrmRuntimeSettings* Settings = GetDefault<UVrmRuntimeSettings>();
+		UE_LOG(LogTemp, Warning, TEXT("測試20: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		{
 			FSoftObjectPath r = Settings->AssetListObject; //(TEXT("/VRM4U/VrmObjectListBP.VrmObjectListBP"));
@@ -407,14 +429,18 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 				}
 			}
 		}
-		if (c == nullptr || VRMConverter::Options::Get().IsUE5Material()) {
+		UE_LOG(LogTemp, Warning, TEXT("測試21: %.2f sec"), FPlatformTime::Seconds() - t0);
+		if (c == nullptr || VRMConverter::Options::Get().IsUE5Material())
+		{
 			FSoftObjectPath r(TEXT("/VRM4U/VrmAssetListObjectBPUE5.VrmAssetListObjectBPUE5"));
 			UObject *u = r.TryLoad();
 			if (u) {
 				c = (UClass*)(Cast<UBlueprint>(u)->GeneratedClass);
 			}
 		}
-		if (c == nullptr){
+		UE_LOG(LogTemp, Warning, TEXT("測試22: %.2f sec"), FPlatformTime::Seconds() - t0);
+		if (c == nullptr)
+		{
 			FSoftObjectPath r(TEXT("/VRM4U/VrmAssetListObjectBP.VrmAssetListObjectBP"));
 			UObject* u = r.TryLoad();
 			if (u) {
@@ -426,6 +452,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 			c = UVrmAssetListObject::StaticClass();
 		}
 
+		UE_LOG(LogTemp, Warning, TEXT("測試23: %.2f sec"), FPlatformTime::Seconds() - t0);
 		{
 			if (ReimportBase) {
 				vrmAssetList = ReimportBase;
@@ -437,8 +464,8 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 				vrmAssetList = NewObject<UVrmAssetListObject>((UObject*)GetTransientPackage(), c.Get());
 			}
 		}
-
 	}
+	UE_LOG(LogTemp, Warning, TEXT("測試24: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	//UVrmAssetListObject *m = Cast<UVrmAssetListObject>(u);
 	//FSoftClassPath r(TEXT("/VRM4U/VrmObjectListBP.VrmObjectListBP"));
@@ -459,6 +486,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 		{
 			ret = ULoaderBPFunctionLibrary::LoadVRMFileLocal(vrmAssetList.Get(), mret, fullFileName);
 		}
+		UE_LOG(LogTemp, Warning, TEXT("測試25: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		/*
 		{
@@ -499,7 +527,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 			GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPostImport(this, mret);
 		}
 #endif
-
+		UE_LOG(LogTemp, Warning, TEXT("測試26: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		GWarn->EndSlowTask();
 
@@ -511,7 +539,8 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 		}
 	}
 	//return InParent;
-	return mret;// ->GetOuter();
+	UE_LOG(LogTemp, Warning, TEXT("測試27: %.2f sec"), FPlatformTime::Seconds() - t0);
+	return mret; // ->GetOuter();
 }
 UObject* UVRM4UImporterFactory::FactoryCreateText(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, const TCHAR* Type, const TCHAR*& Buffer, const TCHAR* BufferEnd, FFeedbackContext* Warn)
 {

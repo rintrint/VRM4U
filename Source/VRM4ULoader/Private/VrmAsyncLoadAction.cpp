@@ -231,9 +231,14 @@ void FVrmAsyncLoadAction::UpdateOperation(FLatentResponse& Response)
 		++SequenceCount;
 
 		localAsset.Importer = new Assimp::Importer();
+
+		double t0 = FPlatformTime::Seconds();
+		UE_LOG(LogTemp, Warning, TEXT("ReadFileFromMemory測試1: %.2f sec"), FPlatformTime::Seconds() - t0);
 		localAsset.ScenePtr = localAsset.Importer->ReadFileFromMemory(localAsset.vrmLocalRes.GetData(), localAsset.vrmLocalRes.Num(),
 			aiProcess_Triangulate | aiProcess_MakeLeftHanded | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals | aiProcess_OptimizeMeshes,
 			"vrm");
+		UE_LOG(LogTemp, Warning, TEXT("ReadFileFromMemory測試2: %.2f sec"), FPlatformTime::Seconds() - t0);
+
 		return;
 	}
 

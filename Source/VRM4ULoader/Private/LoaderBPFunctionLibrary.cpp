@@ -551,9 +551,12 @@ void ULoaderBPFunctionLibrary::GetVRMMeta(FString filepath, UVrmLicenseObject*& 
 
 		e = GetExtAndSetModelTypeLocal(e, Res.GetData(), Res.Num());
 
+		double t1 = FPlatformTime::Seconds();
+		UE_LOG(LogTemp, Warning, TEXT("ReadFileFromMemory測試3: %.2f sec"), FPlatformTime::Seconds() - t1);
 		mScenePtr = mImporter.ReadFileFromMemory(Res.GetData(), Res.Num(),
 			aiProcess_Triangulate | aiProcess_MakeLeftHanded | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals | aiProcess_OptimizeMeshes,
 			e.c_str());
+		UE_LOG(LogTemp, Warning, TEXT("ReadFileFromMemory測試4: %.2f sec"), FPlatformTime::Seconds() - t1);
 
 		UE_LOG(LogVRM4ULoader, Log, TEXT("GetVRMMeta: mScenePtr=%p"), mScenePtr);
 
@@ -676,6 +679,9 @@ bool ULoaderBPFunctionLibrary::LoadVRMFileFromMemoryDefaultOption(UVrmAssetListO
 }
 
 bool ULoaderBPFunctionLibrary::LoadVRMFileFromMemory(const UVrmAssetListObject *InVrmAsset, UVrmAssetListObject *&OutVrmAsset, const FString filepath, const uint8 *pFileDataData, size_t dataSize) {
+	double t0 = FPlatformTime::Seconds();
+	UE_LOG(LogTemp, Warning, TEXT("LoadVRMFileFromMemory測試1: %.2f sec"), FPlatformTime::Seconds() - t0);
+
 	TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("LoadVRMFileFromMemory"))
 
 	OutVrmAsset = nullptr;
@@ -692,6 +698,7 @@ bool ULoaderBPFunctionLibrary::LoadVRMFileFromMemory(const UVrmAssetListObject *
 	if (filepath.IsEmpty())
 	{
 	}
+	UE_LOG(LogTemp, Warning, TEXT("LoadVRMFileFromMemory測試2: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	double StartTime = FPlatformTime::Seconds();
 	auto LogAndUpdate = [&](FString logname) {
@@ -714,9 +721,13 @@ bool ULoaderBPFunctionLibrary::LoadVRMFileFromMemory(const UVrmAssetListObject *
 
 		e_imp = GetExtAndSetModelTypeLocal(e, pFileDataData, dataSize);
 
+		double t1 = FPlatformTime::Seconds();
+		UE_LOG(LogTemp, Warning, TEXT("ReadFileFromMemory測試5: %.2f sec"), FPlatformTime::Seconds() - t1);
 		mScenePtr = mImporter.ReadFileFromMemory(pFileDataData, dataSize,
 			aiProcess_Triangulate | aiProcess_MakeLeftHanded | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals | aiProcess_OptimizeMeshes | aiProcess_PopulateArmatureData,
 			e_imp.c_str());
+		UE_LOG(LogTemp, Warning, TEXT("ReadFileFromMemory測試6: %.2f sec"), FPlatformTime::Seconds() - t1);
+		UE_LOG(LogTemp, Warning, TEXT("LoadVRMFileFromMemory測試3: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		if (mScenePtr == nullptr) {
 			std::string file;
@@ -731,6 +742,7 @@ bool ULoaderBPFunctionLibrary::LoadVRMFileFromMemory(const UVrmAssetListObject *
 		UE_LOG(LogVRM4ULoader, Log, TEXT("VRM:(%3.3lf secs) ReadFileFromMemory"), FPlatformTime::Seconds() - StartTime);
 		StartTime = FPlatformTime::Seconds();
 	}
+	UE_LOG(LogTemp, Warning, TEXT("LoadVRMFileFromMemory測試4: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	UpdateProgress(20);
 	if (mScenePtr == nullptr)
@@ -770,6 +782,7 @@ bool ULoaderBPFunctionLibrary::LoadVRMFileFromMemory(const UVrmAssetListObject *
 		UE_LOG(LogVRM4ULoader, Warning, TEXT("VRM4U: no UVrmAssetListObject.\n"));
 		return false;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("LoadVRMFileFromMemory測試5: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 #if WITH_EDITORONLY_DATA
 	{
@@ -812,6 +825,7 @@ bool ULoaderBPFunctionLibrary::LoadVRMFileFromMemory(const UVrmAssetListObject *
 			ret &= vc.ConvertModel(out);
 			LogAndUpdate(TEXT("ConvertModel"));
 		}
+		UE_LOG(LogTemp, Warning, TEXT("LoadVRMFileFromMemory測試6: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		//meta rename
 		vc.ConvertVrmMetaPost(out, mScenePtr, pFileDataData, dataSize);
@@ -829,6 +843,7 @@ bool ULoaderBPFunctionLibrary::LoadVRMFileFromMemory(const UVrmAssetListObject *
 		ret &= vc.ConvertHumanoid(out);
 		LogAndUpdate(TEXT("ConvertHumanoid"));
 		UpdateProgress(80);
+		UE_LOG(LogTemp, Warning, TEXT("LoadVRMFileFromMemory測試7: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		OutVrmAsset->MeshReturnedData = nullptr;
 		if (ret == false) {
@@ -846,6 +861,7 @@ bool ULoaderBPFunctionLibrary::LoadVRMFileFromMemory(const UVrmAssetListObject *
 
 	VRMSetPhysicsAsset(out->VrmMetaObject->SkeletalMesh, nullptr);
 
+	UE_LOG(LogTemp, Warning, TEXT("LoadVRMFileFromMemory測試8: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	{
 		TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("VRM Save"))
@@ -875,6 +891,7 @@ bool ULoaderBPFunctionLibrary::LoadVRMFileFromMemory(const UVrmAssetListObject *
 
 		LogAndUpdate(TEXT("Save"));
 	}
+	UE_LOG(LogTemp, Warning, TEXT("LoadVRMFileFromMemory測試9: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	if (VRMConverter::IsImportMode()){
 #if WITH_EDITOR
@@ -899,6 +916,7 @@ bool ULoaderBPFunctionLibrary::LoadVRMFileFromMemory(const UVrmAssetListObject *
 
 	}
 	UpdateProgress(100);
+	UE_LOG(LogTemp, Warning, TEXT("LoadVRMFileFromMemory測試10: %.2f sec"), FPlatformTime::Seconds() - t0);
 	return true;
 }
 

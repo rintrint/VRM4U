@@ -96,12 +96,16 @@ bool VRMConverter::InitJSON(const uint8* pFileData, size_t dataSize) {
 static UVrmLicenseObject* tmpLicense0 = nullptr;
 static UVrm1LicenseObject* tmpLicense1 = nullptr;
 void VRMConverter::GetVRMMeta(const aiScene *mScenePtr, UVrmLicenseObject *& a, UVrm1LicenseObject *& b) {
+	double t0 = FPlatformTime::Seconds();
+	UE_LOG(LogTemp, Warning, TEXT("GetVRMMeta測試1: %.2f sec"), FPlatformTime::Seconds() - t0);
+
 	tmpLicense0 = nullptr;
 	tmpLicense1 = nullptr;
 	ConvertVrmMeta(nullptr, mScenePtr, nullptr, 0);
 
 	a = tmpLicense0;
 	b = tmpLicense1;
+	UE_LOG(LogTemp, Warning, TEXT("GetVRMMeta測試2: %.2f sec"), FPlatformTime::Seconds() - t0);
 }
 
 bool VRMConverter::ConvertVrmFirst(UVrmAssetListObject* vrmAssetList, const uint8* pData, size_t dataSize) {
@@ -138,6 +142,8 @@ bool VRMConverter::ConvertVrmFirst(UVrmAssetListObject* vrmAssetList, const uint
 
 
 bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiScene* mScenePtr, const uint8* pData, size_t dataSize) {
+	double t0 = FPlatformTime::Seconds();
+	UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試1: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	//auto GetDataJSON = [](const RAPIDJSON_NAMESPACE::Value& root, std::initializer_list<const char*> path) -> std::optional<const RAPIDJSON_NAMESPACE::Value*> {
 	auto GetDataJSON = [](const RAPIDJSON_NAMESPACE::Value& root, std::initializer_list<const char*> path) -> std::pair<bool, const RAPIDJSON_NAMESPACE::Value*> {
@@ -156,6 +162,7 @@ bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiSce
 		return { true, current };
 		};
 
+	UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試2: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	tmpLicense0 = nullptr;
 	tmpLicense1 = nullptr;
@@ -171,6 +178,7 @@ bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiSce
 		if (vrmAssetList) {
 			package = vrmAssetList->Package;
 		}
+		UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試3: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		if (package == GetTransientPackage() || vrmAssetList == nullptr) {
 			MetaObject = VRM4U_NewObject<UVrmMetaObject>(package, NAME_None, EObjectFlags::RF_Public | RF_Transient, NULL);
@@ -180,8 +188,9 @@ bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiSce
 				lic0 = VRM4U_NewObject<UVrmLicenseObject>(package, NAME_None, EObjectFlags::RF_Public | RF_Transient, NULL);
 			}
 		}
-		else {
-
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試4: %.2f sec"), FPlatformTime::Seconds() - t0);
 			if (vrmAssetList->ReimportBase) {
 				MetaObject = vrmAssetList->ReimportBase->VrmMetaObject;
 				lic0 = vrmAssetList->ReimportBase->VrmLicenseObject;
@@ -201,7 +210,7 @@ bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiSce
 					lic0 = VRM4U_NewObject<UVrmLicenseObject>(package, *(FString(TEXT("VL_")) + vrmAssetList->BaseFileName + TEXT("_VrmLicense")), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
 				}
 			}
-
+			UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試5: %.2f sec"), FPlatformTime::Seconds() - t0);
 		}
 		if (MetaObject) MetaObject->MarkPackageDirty();
 		if (lic0) lic0->MarkPackageDirty();
@@ -217,6 +226,7 @@ bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiSce
 			tmpLicense0 = lic0;
 			tmpLicense1 = lic1;
 		}
+		UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試6: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 		if (VRMConverter::Options::Get().IsVRM10Model()) {
 		}
@@ -232,6 +242,7 @@ bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiSce
 	if (VRMConverter::Options::Get().IsVRM10Model()) {
 		MetaObject->Version = 1;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試7: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	// bone
 	if (VRMConverter::Options::Get().IsVRM10Model()){
@@ -270,6 +281,7 @@ bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiSce
 			MetaObject->humanoidBoneTable.Add(UTF8_TO_TCHAR(a.humanBoneName.C_Str())) = str;
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試8: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	//shape
 	if (VRMConverter::Options::Get().IsVRM10Model()) {
@@ -379,6 +391,7 @@ bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiSce
 			}
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試9: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	// tmp shape...
 	if (pData && vrmAssetList) {
@@ -430,6 +443,7 @@ bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiSce
 			}
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試10: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	if (VRMConverter::Options::Get().IsVRM10Model()) {
 		auto pp = GetDataJSON(jsonData.doc, { "extensions", "VRMC_springBone", "springs"});
@@ -581,6 +595,7 @@ bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiSce
 			}
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試11: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	//constraint
 	if (VRMConverter::Options::Get().IsVRM10Model()) {
@@ -660,6 +675,7 @@ bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiSce
 			}
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試12: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	// vrma
 	if (VRMConverter::Options::Get().IsVRMAModel()) {
@@ -714,7 +730,7 @@ bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiSce
 			}
 		}
 	}
-
+	UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試13: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	// license
 		// license
@@ -813,6 +829,7 @@ bool VRMConverter::ConvertVrmMeta(UVrmAssetListObject* vrmAssetList, const aiSce
 			}
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("ConvertVrmMeta測試14: %.2f sec"), FPlatformTime::Seconds() - t0);
 
 	return true;
 }
